@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="shortcut icon" href="~/Images/favicon.ico" type="image/x-icon" />
+      <title>TEST NEPS LAYERS</title>
+
+      <link href="./styles/bootstrap.css" rel="stylesheet">
+      <link href="./styles/leaflet.css" rel="stylesheet">
+      <link href="./styles/leaflet.groupedlayercontrol.css" rel="stylesheet">
+      <link href="./styles/L.Control.Locate.css" rel="stylesheet">
+      <link href="./styles/Control.Coordinates.css" rel="stylesheet">
+      <link href="./styles/L.Control.Sidebar.css" rel="stylesheet">
+      <link href="../scripts/Redlining/leaflet.draw.css" rel="stylesheet">
+      <link href="./styles/animate.min.css" rel="stylesheet">
+      <link href="./styles/FontAwesome/css/all.css" rel="stylesheet">
+      <link href="./styles/site.css" rel="stylesheet">
+      
+      <script src="../scripts/modernizr-2.8.3.js"></script>
+  </head>
+  <body>
+    <div id="container">
+      <div class="card search-panel" id="panelSearch" style="margin-top: -400px; display: none;">
+          <div class="card-body">
+              <div class="row">
+                  <div class="d-none d-lg-block col-3 text-center">
+                      <div class="d-flex" style="height: 100%">
+                          <img src="./images/neps_logo_small_tranparent.png" class="p-3 text-center" id="imgLogo" title="Logo" />
+                      </div>
+                  </div>
+                  <div class="d-grid col mb-3">
+                      <div class="ms-3 mb-3 float-start d-none d-sm-block d-xl-none">
+                          <span class="small text-muted"><b>Job</b> : </span>
+                          <a class="small text-muted" tabindex="0" data-bs-trigger="focus" data-bs-toggle="popover" title="Job Details"
+                             data-bs-html="true" data-bs-placement="bottom" data-bs-content="Name: @ViewBag.jobName<br/>User: @ViewBag.userName">
+                              Details...
+                          </a>
+                      </div>
+                      <div class="d-grid mb-3 float-start d-block d-sm-none">
+                          <button class="btn btn-sm btn-outline-secondary rounded-pill px-3" 
+                             data-bs-trigger="focus" data-bs-toggle="popover" title="Job Details"
+                             data-bs-html="true" data-bs-placement="bottom" data-bs-content="Name: @ViewBag.jobName<br/>User: @ViewBag.userName">
+                              <span class="small text-muted">JOB DETAILS</span>
+                              <i class="fa fa-circle-info ms-1"></i>
+                          </button>
+                      </div>
+                      <div class="input-group">
+                          <input class="form-control border rounded-pill" type="search" placeholder="EXC ABB / EXC NAME" id="txtSearch">
+                      </div>
+                      <div class="pt-3 px-3" id="searchOptions">
+                          <div class="form-check form-check-inline">
+                              <input class="form-check-input" type="radio" name="searchOpt" id="EXC" value="opt1" checked>
+                              <label class="form-check-label" for="EXC">EXC</label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                              <input class="form-check-input" type="radio" name="searchOpt" id="FDC" value="opt2">
+                              <label class="form-check-label" for="FDC">FDC</label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                              <input class="form-check-input" type="radio" name="searchOpt" id="LatLng" value="opt3">
+                              <label class="form-check-label" for="LatLng">LAT, LON</label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                              <input class="form-check-input" type="radio" name="searchOpt" id="CABLE" value="opt3">
+                              <label class="form-check-label" for="CABLE">CABLE</label>
+                          </div>
+                          <div class="float-end d-none d-xl-block">
+                              <span class="small text-muted"><b>Job</b> : </span>
+                              <a class="small text-muted" tabindex="0" data-bs-trigger="focus" data-bs-toggle="popover" title="Job Details"
+                                 data-bs-html="true" data-bs-placement="bottom" data-bs-content="Name: @ViewBag.jobName<br/>User: @ViewBag.userName">
+                                  Details...
+                              </a>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="d-flex justify-content-center">
+                  <button class="hide-search-panel btn btn-sm btn-secondary px-3" id="btnHideSearch" title="Hide Search Panel">
+                      <i class="fa fa-angle-up me-1"></i>
+                      <span class="small">HIDE</span>
+                  </button>
+              </div>
+              <input type="hidden" name="search_param" value="EXC" id="search_param">
+          </div>
+      </div>
+      <div class="d-flex justify-content-center">
+          <button class="show-search-panel btn btn-sm btn-secondary px-2" id="btnShowSearch" title="Show Search Panel">
+              <i class="fa fa-search me-1"></i>
+              <span class="small">SEARCH</span>
+          </button>
+      </div>
+      <div id="panelSearchResult" class="card result-panel">
+          <div class="card-body" style="height: 100px">
+              <div id="SearchTooltip"></div>
+              <input type="hidden" id="txtSearchCoord" />
+              <input type="hidden" id="txtSearchSWID" />
+          </div>
+      </div>
+      <div id="map"></div>
+  </div>
+  <div class="progress">
+      <div class="progress-bar progress-bar-striped progress-bar-animated bg-info"
+           role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" id="lblStatus"></div>
+  </div>
+  <div class="modal fade" id="modalSaveAs" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <div class="modal-title">Extraction Details form</div>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body px-5">
+                  <div class="row">
+                      <label class="col-form-label" for="txtArea">
+                          Total Drawn Area <sup>2</sup>
+                          <span class="badge bg-success rounded-pill" id="icoAreaPass"><i class="fa fa-check"></i></span>
+                          <span class="badge bg-danger rounded-pill" id="icoAreaFail"><i class="fa fa-xmark"></i></span>
+                          <small id="txtAreaMax" class="text-muted float-end">Area is too big</small>
+                      </label>
+                      <input class="form-control" id="txtArea" disabled readonly />
+                  </div>
+                  <div class="row">
+                      <label class="col-form-label" for="txtCable">Cable</label>
+                      <div class="input-group p-0">
+                          <input class="form-control" id="txtCable" disabled readonly />
+                          <button class="btn btn-secondary hideOnLoad" id="btnAddRemoveCable">
+                              <i class="fa-solid fa-xmark"></i>
+                          </button>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <label class="col-form-label reqOne" for="slcGRNFDC">Granite Template - FDC</label>
+                      
+                  </div>
+                  <div class="row">
+                      <label class="col-form-label reqOne" for="slcGRNFDP">Granite Template - FDP</label>
+                      
+                  </div>
+                  <div class="row">
+                      <label class="col-form-label reqOne" for="slcGRNFDP">Granite Template - FDB</label>
+                      
+                  </div>
+                  <div class="row">
+                      <label class="col-form-label req" for="slcPJTNAME">Project Name</label>
+                      
+                  </div>
+                  <div class="row">
+                      <label class="col-form-label req" for="slcTCHDSGN">Technology Design</label>
+                      
+                  </div>
+                  <div class="row hideOnLoad">
+                      <div class="col-xs mt-3 fw-bolder fst-italic"><span class="req"></span> REQUIRED FIELD</div>
+                      <div class="col-xs fw-bolder fst-italic"><span class="reqOne"></span> EITHER ONE FIELD IS REQUIRED</div>
+                  </div>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary rounded-pill px-5" id="btnExtract" onclick="ExtractPolygon()">Extract</button>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+    <a href="https://www.flaticon.com/free-icons/pin" title="pin icons">Pin icons created by Freepik - Flaticon</a>
+    <input type="hidden" id="valJobName" value="" />
+    <input type="hidden" id="valUserName" value="" />
+
+    <script src="./scripts/jquery-3.6.1.js"></script>
+    <script src="./scripts/jquery-ui-1.13.2.js"></script>
+    <script src="./scripts/popper.min.js"></script>
+    <script src="./scripts/bootstrap.js"></script>
+    <script src="./scripts/RootUrl.js"></script>
+    <script src="./scripts/typeahead.bundle.min.js"></script>
+    <script src="./scripts/handlebars.min.js"></script>
+    <script src="./scripts/leaflet.js"></script>
+    <script src="./scripts/L.Control.Locate.min.js"></script>
+    <script src="./scripts/L.Control.Sidebar.js"></script>
+    <script src="./scripts/NumberFormatter.js"></script>
+    <script src="./scripts/Control.Coordinates.js"></script>
+    <script src="./scripts/spin.js"></script>
+    <script src="./scripts/leaflet.spin.min.js"></script>
+    <script src="./scripts/L.Control.Locate.min.js"></script>
+    <script src="./scripts/L.Control.Sidebar.js"></script>
+    <script src="./scripts/NumberFormatter.js"></script>
+    <script src="./scripts/Control.Coordinates.js"></script>
+    <script src="./scripts/spin.js"></script>
+    <script src="./scripts/leaflet.spin.min.js"></script>
+    <script src="./scripts/leaflet.ajax.min.js"></script>
+    <script src="./scripts/MapView/L.TileLayer.BetterWMS.js"></script>
+    <script src="./scripts/MapView/Layers.js"></script>
+    <script src="./scripts/MapView/MapSettings.js"></script>
+    <script src="./scripts/MapView/AttributionControl.js"></script>
+    <script src="./scripts/MapView/ZoomControl.js"></script>
+    <script src="./scripts/MapView/ScaleControl.js"></script>
+    <script src="./scripts/MapView/CoordinateControl.js"></script>
+    <script src="./scripts/leaflet.groupedlayercontrol.js"></script>
+    <script src="./scripts/MapView/layer_menu_display.js"></script>
+    <script src="./scripts/MapView/Search.js"></script>
+    <script src="./scripts/MapView/RedLining.js"></script>
+    <script src="./scripts/Redlining/Leaflet.draw.js"></script>
+    <script src="./scripts/Redlining/Control.Draw.js"></script>
+    <script src="./scripts/Redlining/Toolbar.js"></script>
+    <script src="./scripts/Redlining/Tooltip.js"></script>
+    <script src="./scripts/Redlining/Leaflet.Draw.Event.js"></script>
+    <script src="./scripts/Redlining/ext/GeometryUtil.js"></script>
+    <script src="./scripts/Redlining/ext/LatLngUtil.js"></script>
+    <script src="./scripts/Redlining/ext/LineUtil.Intersect.js"></script>
+    <script src="./scripts/Redlining/ext/Polygon.Intersect.js"></script>
+    <script src="./scripts/Redlining/ext/Polyline.Intersect.js"></script>
+    <script src="./scripts/Redlining/ext/TouchEvents.js"></script>
+    <script src="./scripts/Redlining/draw/DrawToolbar.js"></script>
+    <script src="./scripts/Redlining/draw/handler/Draw.Feature.js"></script>
+    <script src="./scripts/Redlining/draw/handler/Draw.SimpleShape.js"></script>
+    <script src="./scripts/Redlining/draw/handler/Draw.Polyline.js"></script>
+    <script src="./scripts/Redlining/draw/handler/Draw.Marker.js"></script>
+    <script src="./scripts/Redlining/draw/handler/Draw.Polygon.js"></script>
+    <script src="./scripts/Redlining/draw/handler/Draw.Rectangle.js"></script>
+    <script src="./scripts/Redlining/draw/handler/Draw.CircleMarker.js"></script>
+    <script src="./scripts/Redlining/draw/handler/Draw.Circle.js"></script>
+    <script src="./scripts/Redlining/edit/EditToolbar.js"></script>
+    <script src="./scripts/Redlining/edit/handler/EditToolbar.Edit.js"></script>
+    <script src="./scripts/Redlining/edit/handler/EditToolbar.Delete.js"></script>
+    <script src="./scripts/Redlining/edit/handler/Edit.Poly.js"></script>
+    <script src="./scripts/Redlining/edit/handler/Edit.SimpleShape.js"></script>
+    <script src="./scripts/Redlining/edit/handler/Edit.Rectangle.js"></script>
+    <script src="./scripts/Redlining/edit/handler/Edit.Marker.js"></script>
+    <script src="./scripts/Redlining/edit/handler/Edit.CircleMarker.js"></script>
+    <script src="./scripts/Redlining/edit/handler/Edit.Circle.js"></script>
+    <script src="./scripts/Redlining/AddToMap.js"></script>
+    <script src="./scripts/generalScripts.js"></script>
+    <script>
+      $(document).ready(function () {
+        $("#icoAreaFail").hide();
+        $("#btnExtract").prop("disabled", true);
+
+        $("#txtSearch").focus();
+
+        $("#btnHideSearch").click(function () {
+          $("#panelSearch").delay(100).animate({
+            marginTop: "-400px"
+            }, "500", function () {
+          
+              $(this).hide();
+              $("#btnShowSearch").show();
+          });
+        });
+
+        $("#btnShowSearch").click(function () {
+
+          $("#panelSearch").removeAttr("style").show();
+          $("#btnShowSearch").hide();
+          $("#txtSearch").focus();
+
+          var searchVal = $("#txtSearch").val();
+        });
+
+        $(".form-check").click(function () {
+          changeSearchRadio();
+          $("#txtSearch").focus();
+        });
+
+        $("#txtSearch").on("keyup input", function () {
+          var searchVal = $(this).val();
+
+          if (searchVal != "") {
+            typeSearch();
+          } else {
+            clearSearch();
+          }
+        });
+
+        $(".optRequired, .optRequiredOne").change(function () {
+          EnableExtractButton();
+        });
+
+        $("#modalSaveAs").on('shown.bs.modal', function () {
+          var CableVal = $("#txtCable").val();
+
+          if (CableVal == "") {
+            $("#btnAddRemoveCable").removeClass("btn-danger").addClass("btn-secondary");
+            $("#btnAddRemoveCable i").removeClass("fa-xmark").addClass("fa-plus");
+          } else {
+            $("#btnAddRemoveCable").removeClass("btn-secondary").addClass("btn-danger");
+            $("#btnAddRemoveCable i").removeClass("fa-plus").addClass("fa-xmark");
+          }
+        });
+
+        $("#btnAddRemoveCable").click(function () {
+          var CableVal = $("#txtCable").val();
+          var question = "";
+
+          if (CableVal == "") question = "ADD Cable?";
+          else question = "REPLACE Cable?";
+
+          let result = window.confirm(question);
+
+          if (result) {
+            $("#txtCable").val("");
+
+            $("#modalSaveAs").modal("hide");
+
+            $("#CABLE").attr("checked", "checked");
+            setTimeout(function () {
+              $(".form-check").trigger("click");
+            }, 100);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

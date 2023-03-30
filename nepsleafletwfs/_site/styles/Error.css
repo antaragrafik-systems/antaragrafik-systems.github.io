@@ -1,0 +1,78 @@
+﻿html {
+    min-height: 100%;
+    overflow: hidden;
+}
+
+body {
+    height: calc(100vh - 8em);
+    padding: 4em;
+    color: rgba(255,255,255,.75);
+    font-family: 'Anonymous Pro', monospace;
+    background-color: rgb(25,25,25);
+}
+
+.line-1 {
+    position: relative;
+    top: 50%;
+    width: 24em;
+    margin: 0 auto;
+    border-right: 5px solid rgba(255,255,255,.75);
+    font-size: 180%;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    transform: translateY(-50%);
+}
+
+/* Animation */
+.anim-typewriterIP {
+    animation: typewriter-InvalidParam 2s steps(20) 1s 1 normal both, blinkTextCursor 800ms steps(20) infinite normal;
+}
+
+.anim-typewriter403 {
+    animation: typewriter-PageNotAllowed 3s steps(20) 1s 1 normal both, blinkTextCursor 800ms steps(20) infinite normal;
+}
+
+.anim-typewriter404 {
+    animation: typewriter-PageNotFound 2s steps(20) 1s 1 normal both, blinkTextCursor 800ms steps(20) infinite normal;
+}
+
+@keyframes typewriter-InvalidParam {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 11.5em;
+    }
+}
+
+@keyframes typewriter-PageNotAllowed {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 18.5em;
+    }
+}
+
+@keyframes typewriter-PageNotFound {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 7.5em;
+    }
+}
+
+@keyframes blinkTextCursor {
+    from {
+        border-right-color: rgba(255,255,255,.75);
+    }
+
+    to {
+        border-right-color: transparent;
+    }
+}

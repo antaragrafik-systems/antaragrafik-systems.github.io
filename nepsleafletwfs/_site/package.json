@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "serve": "hot-server"
+  },
+  "dependencies": {
+    "hot-server": "^0.0.27"
+  }
+}

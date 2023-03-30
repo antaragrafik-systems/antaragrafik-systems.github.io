@@ -1,0 +1,249 @@
+﻿body {
+    font-family: Arial;
+    font-size: 10pt;
+    padding: 0;
+    /*padding-top: 75px;*/
+    margin: 0;
+}
+
+html, body {
+    height: 100%;
+    font: 10pt "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+#map {
+    width: auto;
+    height: 100%;
+    width: 100%;
+    /*box-shadow: 0 0 10px rgba(0,0,0,0.5);*/
+    position: relative;
+    z-index: 1;
+    outline: none;
+}
+
+html, body, #container {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+.trsearch {
+    /*background-color: ghostwhite;*/
+    padding: 10px;
+    /*width: 200px;*/
+}
+
+#liSearch {
+    /*list-style-type: none;*/
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: block;
+    outline: none;
+}
+
+.divSearchList {
+    background-color: ghostwhite;
+    width: 50%;
+}
+
+.leafletBtnDisabled {
+    /*cursor: not-allowed;*/
+    filter: contrast(22%) brightness(157%);
+    pointer-events: none;
+}
+
+.leafletBndIndex {
+    z-index: 999;
+}
+
+.leaflet-container.black-bg {
+    background-color: black;
+}
+
+.leaflet-container.white-bg {
+    background-color: white;
+}
+
+.leaflet-container.gray-bg {
+    background-color: dimgray;
+}
+
+/* JQUERY UI - Autocomplete while selecting */
+.ui-menu-item .ui-menu-item-wrapper.ui-state-active {
+    background: #1E90FF !important;
+    font-weight: bold !important;
+    color: aliceblue;
+    cursor: pointer;
+} 
+
+.border-top-bottom {
+    font-family: Roboto;
+    font-size: 0.7rem;
+    border-top-color: rgba(255,255,255,0.7) !important;
+    border-bottom-color: rgba(255,255,255,0.7) !important;
+    border-top: solid 1px;
+    border-bottom: solid 1px;
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+    /*margin-top: 0.5rem;*/
+}
+
+.border-left {
+    font-family: Roboto;
+    font-size: 0.7rem;
+    border-top-color: rgba(255,255,255,0.7) !important;
+    border-bottom-color: rgba(255,255,255,0.7) !important;
+    border-left-color: rgba(255,255,255,0.7) !important;
+    border-top: solid 1px;
+    border-bottom: solid 1px;
+    border-left: solid 1px;
+    border-right: 0;
+    border-radius: 0;
+    border-top-left-radius: .25rem;
+    border-bottom-left-radius: .25rem;
+}
+
+.border-right {
+    font-family: Roboto;
+    font-size: 0.7rem;
+    border-top-color: rgba(255,255,255,0.7) !important;
+    border-bottom-color: rgba(255,255,255,0.7) !important;
+    border-right-color: rgba(255,255,255,0.7) !important;
+    border-top: solid 1px;
+    border-bottom: solid 1px;
+    border-right: solid 1px;
+    border-left: 0;
+    border-radius: 0;
+    border-top-right-radius: .25rem;
+    border-bottom-right-radius: .25rem;
+}
+
+.input-group-border-right {
+    border-top-color: rgba(255,255,255,0.7) !important;
+    border-bottom-color: rgba(255,255,255,0.7) !important;
+    border-right-color: rgba(255,255,255,0.7) !important;
+    border-top: solid .1rem;
+    border-bottom: solid .1rem;
+    border-right: solid .1rem;
+    border-radius: .05rem;
+}
+
+.input-group-text {
+    font-family: Roboto;
+    font-size: 0.7rem;
+}
+
+/*-------------------------*/
+
+.ms-n5 {
+    margin-left: -40px;
+}
+
+.search-panel {
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    position: fixed;
+    z-index: 999;
+    opacity: 0.9;
+    width: 50%;
+    top: 10px;
+    left: 25%;
+}
+
+.hide-search-panel {
+    position: absolute;
+    bottom: -10px;
+    /*right: 5%;*/
+}
+
+.show-search-panel {
+    position: fixed;
+    display: none;
+    z-index: 999;
+    top: 0px;
+}
+
+.result-panel {
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    position: fixed;
+    z-index: 999;
+    opacity: 0.9;
+    display: none;
+    width: 50%;
+    top: 150px;
+    left: 25%;
+}
+
+#imgLogo {
+    height: 80px;
+    margin: auto;
+}
+
+.req:after {
+    content: "*";
+    color: red;
+}
+
+.reqOne:after {
+    content: "*";
+    color: green;
+}
+
+.hideOnLoad {
+    display: none;
+}
+
+/*-------------------------*/
+.btn-legend-pin {
+    padding-left: 2px;
+    padding-right: 6px;
+    border: none;
+    background-color: #fff;
+    color: #212529;
+    border-radius: 0.25rem;
+}
+
+.btn-legend-pin :hover {
+    color: #888;
+}
+
+.ui-front {
+    z-index: 10000;
+}
+
+/* 
+    Bootstrap sizes:-
+    -----------------
+    large - 1200px
+    medium - 992px
+    small - 768px
+*/
+
+@media only screen and (min-width: 768px) {
+    .divSearchList {
+        width: 60%;
+    }
+}
+
+@media only screen and (min-width: 992px) {
+    .divSearchList {
+        width: 50%;
+    }
+}
+
+@media only screen and (min-width: 1200px) {
+    .divSearchList {
+        width: 35%;
+    }
+}
+
+@media only screen and (max-width: 1200px) {
+    .result-panel {
+        top: 180px;
+    }
+}
+
+/*
+    https://stackoverflow.com/questions/24087944/bootstrap-different-img-size-at-lg-md-sm-and-xs
+*/

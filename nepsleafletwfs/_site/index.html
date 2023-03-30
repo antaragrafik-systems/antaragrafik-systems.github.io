@@ -1,0 +1,176 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	
+	<title>NEPS WFS</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<link rel="stylesheet" href="./leaflet/leaflet.css" crossorigin="" />
+	<link rel="stylesheet" href="./leaflet.draw/leaflet.draw.css" />
+	<style>
+		#mapid {
+			width: 1024px;
+			height: 800px;
+		}
+	</style>
+</head>
+<body>
+
+	<div id="mapid"></div>
+
+	<script src="./leaflet/leaflet.js" crossorigin=""></script>
+	<script src="./leaflet.draw//leaflet.draw.js"></script>
+    <script src="./jQuery//jquery-3.6.3.min.js"></script>
+	<script src="./leaflet-geoserver-request/L.Geoserver.js"></script>
+	<script>
+		var mymap = L.map('mapid').setView([3.1163678948731124, 101.66588065128103], 13);
+
+		L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    		maxZoom: 19,
+    		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+		}).addTo(mymap);
+
+		//wfs
+		var wfsLayer = L.Geoserver.wfs("http://tmservice.asuscomm.com:8080/geoserver/ows", {
+			layers: 'tm:project_boundary'
+		});
+		wfsLayer.addTo(mymap);
+
+		var center = [-33.8650, 151.2094];
+
+		L.marker(center).addTo(mymap);
+
+		// Initialise the FeatureGroup to store editable layers
+		var editableLayers = new L.FeatureGroup();
+		mymap.addLayer(editableLayers);
+
+		var drawPluginOptions = {
+		position: 'topright',
+		draw: {
+			polygon: {
+			allowIntersection: false, // Restricts shapes to simple polygons
+			drawError: {
+				color: '#e1e100', // Color the shape will turn when intersects
+				message: '<strong>Oh snap!<strong> you can\'t draw that!' // Message that will show when intersect
+			},
+			shapeOptions: {
+				color: '#97009c'
+			}
+			},
+			// disable toolbar item by setting it to false
+			polyline: false,
+			circle: false, // Turns off this drawing tool
+			rectangle: true,
+			marker: false,
+			},
+		edit: {
+			featureGroup: editableLayers, //REQUIRED!!
+			remove: false
+		}
+		};
+
+		// Initialise the draw control and pass it the FeatureGroup of editable layers
+		var drawControl = new L.Control.Draw(drawPluginOptions);
+		mymap.addControl(drawControl);
+
+		var editableLayers = new L.FeatureGroup();
+		mymap.addLayer(editableLayers);
+
+		var geojsonStyle = {
+			fillColor: "#ff7800",
+			color: "#000",
+			weight: 1,
+			opacity: 1,
+			fillOpacity: 0.8,
+    	};
+
+		mymap.on('draw:created', function(e) {
+			var type = e.layerType,
+				layer = e.layer;
+
+			if (type === 'marker') {
+				layer.bindPopup('A popup!');
+			}
+
+			editableLayers.addLayer(layer);
+
+			let polygonCoord = '';
+
+			layer.getLatLngs()[0].forEach((e) => {
+				polygonCoord += e.lat + ' ' + e.lng + ",";
+			});
+			polygonCoord += layer.getLatLngs()[0][0].lat + ' ' + layer.getLatLngs()[0][0].lng;
+
+			let cqlfilter = "OVERLAPS(geom, POLYGON ((" + polygonCoord + "))) ";
+			let callback = "getJson";
+			let service = "WFS";
+			let version = "1.1.0";
+			let request = "GetFeature";
+			let typeName = "tm:project_boundary";
+			let srsname = "EPSG%3A4326";
+			let outputFormat = "application/json";
+			let format_options = "callback%3A%20getJson";
+
+			let wfs = "http://tmservice.asuscomm.com:8080/geoserver/ows?"
+			wfs = wfs + "&callback="+ callback;
+			wfs = wfs + "&service="+ service;
+			wfs = wfs + "&version="+ version;
+			wfs = wfs + "&request=" + request;
+			wfs = wfs + "&typeName=" + typeName;
+			wfs = wfs + "&srsname=" + srsname;
+			wfs = wfs + "&outputFormat=" + outputFormat;
+			wfs = wfs + "&format_options=" + format_options;
+			wfs = wfs + "&_=1677851551283" ;
+			wfs = wfs + "&CQL_FILTER=" + cqlfilter;
+
+    		$.getJSON(wfs).then((res) => {
+        		let layers = L.geoJson(res, {
+            		onEachFeature: function (feature, layer) {
+                		layer.bindPopup("tm:project_boundary").addTo(mymap)
+            		},
+            		style: geojsonStyle,
+        		}).addTo(mymap);
+
+				let selectedBox = calculateSelectedBox(layers); 
+
+				console.log(selectedBox);
+
+	        	mymap.fitBounds(layer.getBounds());
+		    });
+		});
+
+		function calculateSelectedBox(layers) {
+			let sumTotalGeoInt =  0;
+			let sumTotalFDPPort = 0;
+			let hasHighrise = false
+			let avgSuggestedPF = 0;
+
+			let sumSuggestedPF = 0;
+			let totalSuggestedPF = 0;
+
+			for (const key in layers._layers) {
+				sumTotalGeoInt += layers._layers[key].feature.properties.total_geoint;
+				sumTotalFDPPort += layers._layers[key].feature.properties.total_fdp_port;
+
+				if (layers._layers[key].feature.properties.property_building_type == 'high-rise') {
+					hasHighrise = true;
+				}
+
+				sumSuggestedPF += layers._layers[key].feature.properties.suggested_pf;
+				totalSuggestedPF++;
+			}
+			avgSuggestedPF = sumSuggestedPF / totalSuggestedPF;
+
+			return {
+				sumTotalGeoInt: sumTotalGeoInt,
+				sumTotalFDPPort: sumTotalFDPPort,
+				hasHighrise: hasHighrise,
+				avgSuggestedPF: avgSuggestedPF
+			};
+		}
+	</script>
+</body>
+</html>
